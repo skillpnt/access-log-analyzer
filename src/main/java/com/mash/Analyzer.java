@@ -6,12 +6,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class Analyzer {
 
     public static void main(String[] args) throws IOException {
-        double minAvailability = 0;
-        long maxAnswerTime = 0;
+        double minAvailability = -1;
+        long maxAnswerTime = -1;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-u")) {
                 minAvailability = Double.parseDouble(args[i + 1]);
@@ -20,13 +21,18 @@ public class Analyzer {
             }
         }
 
+        if (minAvailability < 0 || maxAnswerTime < 0) {
+            System.out.println("Invalid arguments. Use -u for max availability level. Use -t for max answer time");
+            return;
+        }
+
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         List<TimeInterval> timeIntervals = analyzeFailures(reader, minAvailability, maxAnswerTime);
 
         for (TimeInterval interval : timeIntervals) {
-            System.out.println(interval.getStartTime() + " " + interval.getEndTime() + " " + interval.getAvailability());
+            System.out.println(interval.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + " " + interval.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + " " + String.format(Locale.US,"%.2f", interval.getAvailability()));
         }
     }
 
